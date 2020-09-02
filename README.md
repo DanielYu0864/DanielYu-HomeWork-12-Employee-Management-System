@@ -9,7 +9,7 @@ Design the following database schema containing three tables:
 ![Database Schema](Assets/schema.png)
 
 * **department**:
-
+i
   * **id** - INT PRIMARY KEY
   * **name** - VARCHAR(30) to hold department name
 
@@ -27,7 +27,7 @@ Design the following database schema containing three tables:
   * **last_name** - VARCHAR(30) to hold employee last name
   * **role_id** - INT to hold reference to role employee has
   * **manager_id** - INT to hold reference to another employee that manager of the current employee. This field may be null if the employee has no manager
-  
+
 Build a command-line application that at a minimum allows the user to:
 
   * Add departments, roles, employees
@@ -131,7 +131,7 @@ You are required to submit the following:
 
 * The URL of the GitHub repository
 
-* A video demonstrating the entirety of the app's functionality 
+* A video demonstrating the entirety of the app's functionality
 
 - - -
 © 2019 Trilogy Education Services, a 2U, Inc. brand. All Rights Reserved.
