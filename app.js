@@ -12,7 +12,7 @@ const db = mysql.createConnection({
 
 db.connect(function(err) {
     if(err) throw err;
-
+    mainOption();
 });
 
 const mainOption = () => {
@@ -20,10 +20,49 @@ const mainOption = () => {
         name: 'main',
         type: 'list',
         message: 'what you want',
-        choices: ['view', 'add','update' ,'delete']
+        choices: ['View', 'Add','Update' ,'Delete', 'End']
     }).then((answer) => {
-
+        switch(answer.main) {
+            case 'View':
+                viewOption();
+            break;
+            case 'Add':
+                addOption();
+            break;
+            case 'Update':
+                updateOption();
+            break;
+            case 'Delete':
+                deleteOption();
+            break;
+            default:
+                console.log('End');
+                db.end();
+        }
     });
+}
+const viewOption = () => {
+    inquirer
+        .prompt({
+            name: 'view',
+            type: 'list',
+            message: 'view options',
+            choices: ['Department', 'Role', 'Employee', 'Back']
+        }).then((answer) => {
+            switch(answer.view) {
+                case 'Department':
+                    viewDepartment();
+                break;
+                case 'Role':
+                    viewRole();
+                break;
+                case 'Employee':
+                    viewEmployee();
+                break;
+                default:
+                    mainOption();
+            }
+        });
 }
 
 const viewDepartment = () => {
