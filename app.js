@@ -14,26 +14,27 @@ db.connect(function(err) {
     if(err) throw err;
     mainOption();
 });
-
+// prompt
 const mainOption = () => {
     inquirer.prompt({
         name: 'main',
         type: 'list',
         message: 'what you want',
         choices: ['View', 'Add','Update' ,'Delete', 'End']
-    }).then((answer) => {
+    })
+    .then((answer) => {
         switch(answer.main) {
             case 'View':
-                viewOption();
+                viewFunction();
             break;
             case 'Add':
-                addOption();
+                addFunction();
             break;
             case 'Update':
-                updateOption();
+                updateFunction();
             break;
             case 'Delete':
-                deleteOption();
+                deleteFunction();
             break;
             default:
                 console.log('End');
@@ -41,14 +42,16 @@ const mainOption = () => {
         }
     });
 }
-const viewOption = () => {
+
+const viewFunction = () => {
     inquirer
         .prompt({
             name: 'view',
             type: 'list',
             message: 'view options',
             choices: ['Department', 'Role', 'Employee', 'Back']
-        }).then((answer) => {
+        })
+        .then((answer) => {
             switch(answer.view) {
                 case 'Department':
                     viewDepartment();
@@ -65,36 +68,72 @@ const viewOption = () => {
         });
 }
 
+const addFunction = () => {
+    inquirer
+        .prompt({
+            name: 'add',
+            type: 'list',
+            message: 'Add options',
+            choices: ['Department', 'Role', 'Employee', 'Back']
+        })
+        .then((answer) => {
+            switch(answer.add) {
+                case 'Department':
+                    console.log('department');
+                    addDepartment();
+                break;
+                case 'Role':
+
+                break;
+                case 'Employee':
+
+                break;
+                default:
+                    mainOption();
+            }
+        });
+}
+
+
+
+
+
+// Department sql functions
 const viewDepartment = () => {
     db.query(`SELECT department.name AS 'Department'
     FROM department`, function(err, res) {
         if(err) throw err;
         console.log(res);
-        db.end();
+        mainOption();
     });
 }
-
 const addDepartment = () => {
-    db.query(`
-    INSERT INTO department (name)
-    VALUES (?)
-    `, 'department.name' ,function(err, res) {
-        if(err) throw err;
-        console.log('add department successed');
-        db.end();
-    });
+    inquirer
+        .prompt({
+            name: 'department',
+            type: 'input',
+            message: 'deparment name'
+        })
+        .then((input) => {
+            db.query(`
+                INSERT INTO department (name)
+                VALUES (?)
+                `, input.department ,function(err, res) {
+                if(err) throw err;
+                console.log('add department successed');
+            });
+        });
 }
-
 const deleteDepartment = () => {
     db.query(`
     DELETE FROM department WHERE id = ?
     `,'department.id' ,function(err, res) {
         if(err) throw err;
         console.log('deleted department');
-        db.end();
+        mainOption();
     });
 }
-
+// role sql functions
 const viewRole = () => {
     db.query(`
     SELECT
@@ -105,10 +144,9 @@ const viewRole = () => {
     INNER JOIN role ON department.id = role.department_id`,function(err, res) {
         if(err) throw err;
         console.log(res);
-        db.end();
+        mainOption();
     });
 }
-
 const addRole = () => {
     db.query(`
     INSERT INTO role (title, salary, department_id)
@@ -117,20 +155,20 @@ const addRole = () => {
     function(err, res) {
         if(err) throw err;
         console.log('added Role');
-        db.end();
+        mainOption();
     });
 }
-
 const deleteRole = () => {
     db.query(`
     DELETE FROM role WHERE id = ?
     `,'role.id' ,function(err, res) {
         if(err) throw err;
         console.log('deleted role');
-        db.end();
+        mainOption();
     });
 }
 
+// employee sql functions
 const viewEmployee = () => {
     db.query(`
     SELECT
@@ -148,10 +186,9 @@ const viewEmployee = () => {
     `, function(err, res) {
         if(err) throw err;
         console.log(res);
-        db.end();
+        mainOption();
     });
 }
-
 const addEmployee = () =>{
     db.query(`
     INSERT INTO employee (first_name, last_name, role_id, manager_id)
@@ -159,10 +196,9 @@ const addEmployee = () =>{
     `,['first', 'last','role', 'manager'] ,function (err, res) {
         if(err) throw err;
         console.log('add employee successed');
-        db.end();
+        mainOption();
     });
 }
-
 const updateEmployee = () => {
     db.query(`
     UPDATE employee
@@ -171,7 +207,7 @@ const updateEmployee = () => {
     `, ['role_id','employee.id'], function(err, res) {
         if(err) throw err;
         console.log('updated employee');
-        db.end();
+        mainOption();
     })
 }
 
@@ -181,6 +217,6 @@ const deleteEmployee = () => {
     `, 'id', function(err, res) {
         if(err) throw err;
         if(res) console.log('delete employ successed');
-        db.end();
+        mainOption();
     });
 }
