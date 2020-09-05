@@ -1,7 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 // const consoleTable = require("console.table");
-
+const roleObj = [];
+const employObj = [];
 const db = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -12,8 +13,11 @@ const db = mysql.createConnection({
 
 db.connect(function(err) {
     if(err) throw err;
-    mainOption();
+    findEmployee();
+    // mainOption();
 });
+
+
 // prompt
 const mainOption = () => {
     inquirer.prompt({
@@ -79,14 +83,13 @@ const addFunction = () => {
         .then((answer) => {
             switch(answer.add) {
                 case 'Department':
-                    console.log('department');
                     addDepartment();
                 break;
                 case 'Role':
-
+                    addRole();
                 break;
                 case 'Employee':
-
+                    addEmployee();
                 break;
                 default:
                     mainOption();
@@ -110,7 +113,7 @@ const viewDepartment = () => {
 const addDepartment = () => {
     inquirer
         .prompt({
-            name: 'department',
+            name: 'name',
             type: 'input',
             message: 'deparment name'
         })
@@ -118,7 +121,7 @@ const addDepartment = () => {
             db.query(`
                 INSERT INTO department (name)
                 VALUES (?)
-                `, input.department ,function(err, res) {
+                `, input.name ,function(err, res) {
                 if(err) throw err;
                 console.log('add department successed');
             });
@@ -137,6 +140,7 @@ const deleteDepartment = () => {
 const viewRole = () => {
     db.query(`
     SELECT
+        role.id AS 'ID',
         role.title AS 'Title',
         department.name AS 'Department',
         role.salary AS 'Salary'
@@ -147,17 +151,145 @@ const viewRole = () => {
         mainOption();
     });
 }
-const addRole = () => {
-    db.query(`
-    INSERT INTO role (title, salary, department_id)
-    VALUES(?,?,?)
-    `,['role.title', 'role.salary', 'department_id'],
-    function(err, res) {
-        if(err) throw err;
-        console.log('added Role');
-        mainOption();
-    });
+
+const findDepartment = () => {
+    db.query(`SELECT * FROM department`,
+        function(err, res) {
+            if(err) throw err;
+
+            let deparmentObj = JSON.stringify(res);
+            console.log(deparmentObj);
+            return deparmentObj;
+        })
 }
+
+
+
+const findDepartmentId = (name, idArray) => {
+    for(let i = 0; i < idArray.length ;i++ ) {
+        if(name === idArray[i].name) {
+            return idArray[i].id;
+        }
+    }
+}
+const addRole = () => {
+    db.query(`SELECT * FROM department`,
+        function(err, result) {
+            if(err) throw err;
+            inquirer
+                .prompt([
+                    {
+                        name: 'title',
+                        type: 'input',
+                        message: 'role title'
+                    },
+                    {
+                        name: 'salary',
+                        type: 'number',
+                        message: 'role salary'
+                    },
+                    {
+                        name: 'department_name',
+                        type: 'rawlist',
+                        message: 'department',
+                        choices: () => {
+                            const list = [];
+                            for(let i = 0; i < result.length; i++) {
+                                list.push(result[i].name);
+                            }
+                            return list;
+                            }
+                    }
+                ]) // prompt end
+                .then((answer) => {
+                    // console.log(answer);
+                    const department_id = findDepartmentId(answer.department_name, result);
+                    db.query(`
+                        INSERT INTO role (title, salary, department_id)
+                        VALUES(?,?,?)
+                        `,[answer.title, answer.salary, department_id],
+                        function(err, res) {
+                            if(err) throw err;
+                            console.log('added Role: ' + JSON.stringify(answer));
+                        });
+                }).catch(err => err);
+            });
+}
+const findRole = () => {
+    db.query(`SELECT id, title FROM role`,
+        function(err, res){
+            if(err) throw err;
+            for(let i = 0; i < res.length ;i++) {
+                roleObj.push(res[i]);
+            }
+            // console.log(roleObj);
+            return roleObj;
+        });
+}
+
+const findEmployee = () => {
+    db.query(`SELECT id,
+    CONCAT(first_name, ' ', last_name) AS 'name'
+    FROM employee`, function(err, res) {
+        if(err) throw err;
+        for(let i = 0; i< res.length ; i++) {
+
+        }
+        console.log(res);
+    })
+}
+
+const addEmployee = () =>{
+            findRole();
+            inquirer
+                .prompt([
+                    {
+                        name: 'first_name',
+                        type: 'input',
+                        message: 'Employee\'s first name'
+                    },
+                    {
+                        name: 'last_name',
+                        type: 'input',
+                        message: 'Employee\'s last name'
+                    },
+                    {
+                        name: 'role',
+                        type: 'rawlist',
+                        message: 'employee role',
+                        choices: () => {
+                            const list = [];
+                            for(let i = 0; i < roleObj.length; i++) {
+                                list.push(roleObj[i].title);
+                                // console.log(list);
+                            }
+                            return list;
+                        }
+                    },
+                    {
+                        name: 'manager',
+                        type: 'rawlist',
+                        message: 'employee\'s manager',
+                        console: () => {
+
+                        }
+                    }
+                ])
+                .then((answer) => {
+                    console.log(answer);
+                }).catch(err => err);
+        }
+    // db.query(`
+    // INSERT INTO employee (first_name, last_name, role_id, manager_id)
+    // VALUES (?, ?, ? , ?)
+    // `,['first', 'last','role', 'manager'] ,function (err, res) {
+    //     if(err) throw err;
+    //     console.log('add employee successed');
+    //     mainOption();
+    // });
+// }
+
+
 const deleteRole = () => {
     db.query(`
     DELETE FROM role WHERE id = ?
@@ -189,16 +321,7 @@ const viewEmployee = () => {
         mainOption();
     });
 }
-const addEmployee = () =>{
-    db.query(`
-    INSERT INTO employee (first_name, last_name, role_id, manager_id)
-    VALUES (?, ?, ? , ?)
-    `,['first', 'last','role', 'manager'] ,function (err, res) {
-        if(err) throw err;
-        console.log('add employee successed');
-        mainOption();
-    });
-}
+
 const updateEmployee = () => {
     db.query(`
     UPDATE employee
