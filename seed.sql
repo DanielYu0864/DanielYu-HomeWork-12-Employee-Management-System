@@ -75,6 +75,18 @@ INNER JOIN employee c2 ON c1.manager_id = c2.id;
 
 -- View employee
 SELECT 
+	employee.id AS 'ID',
+	employee.first_name AS 'First Name',
+    employee.last_name AS 'Last Name',
+	department.name AS 'Department',
+    role.title AS 'Role',
+    role.salary AS 'Salary'
+FROM department
+INNER JOIN role ON department.id = role.department_id
+INNER JOIN employee ON role.id = employee.role_id
+WHERE manager_id = 1;
+
+SELECT 
 	c1.id AS 'ID',
 	c1.first_name AS 'First Name',
     c1.last_name AS 'Last Name',
@@ -84,9 +96,8 @@ SELECT
 	CONCAT(c2.first_name, ' ', c2.last_name) AS 'Manager'
 FROM department
 INNER JOIN role ON department.id = role.department_id
-LEFT JOIN employee c1 ON role.id = c1.role_id
+INNER JOIN employee c1 ON role.id = c1.role_id
 LEFT JOIN employee c2 ON c1.manager_id = c2.id;
-
 DELETE 
 FROM employee
 WHERE Role = 'Lawyer';
