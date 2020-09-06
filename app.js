@@ -2,7 +2,7 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 // const consoleTable = require("console.table");
 const roleObj = [];
-const employObj = [];
+const employeeObj = [];
 const db = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -13,8 +13,8 @@ const db = mysql.createConnection({
 
 db.connect(function(err) {
     if(err) throw err;
-    findEmployee();
-    // mainOption();
+    // findEmployee();
+    mainOption();
 });
 
 
@@ -26,8 +26,8 @@ const mainOption = () => {
         message: 'what you want',
         choices: ['View', 'Add','Update' ,'Delete', 'End']
     })
-    .then((answer) => {
-        switch(answer.main) {
+    .then((chosen) => {
+        switch(chosen.main) {
             case 'View':
                 viewFunction();
             break;
@@ -55,8 +55,8 @@ const viewFunction = () => {
             message: 'view options',
             choices: ['Department', 'Role', 'Employee', 'Back']
         })
-        .then((answer) => {
-            switch(answer.view) {
+        .then((chosen) => {
+            switch(chosen.view) {
                 case 'Department':
                     viewDepartment();
                 break;
@@ -80,8 +80,8 @@ const addFunction = () => {
             message: 'Add options',
             choices: ['Department', 'Role', 'Employee', 'Back']
         })
-        .then((answer) => {
-            switch(answer.add) {
+        .then((chosen) => {
+            switch(chosen.add) {
                 case 'Department':
                     addDepartment();
                 break;
@@ -98,7 +98,133 @@ const addFunction = () => {
 }
 
 
+const deleteFunction = () => {
+    inquirer
+        .prompt({
+            name: 'delete',
+            type: 'list',
+            message: 'delete options',
+            choices: ['Department', 'Role', 'Employee', 'Back']
+        })
+        .then((chosen) => {
+            switch(chosen.delete) {
+                case 'Department':
+                    deleteDepartment();
+                break;
+                case 'Role':
+                    deleteRole();
+                break;
+                case 'Employee':
+                    deleteEmployee();
+                break;
+                default:
+                    mainOption();
+            }
 
+        })
+        .catch((err) => err);
+}
+
+const deleteDepartment = () => {
+
+
+    db.query(`
+    DELETE FROM department WHERE id = ?
+    `,'department.id' ,function(err, res) {
+        if(err) throw err;
+        console.log('deleted department');
+        mainOption();
+    });
+}
+
+
+const deleteRole = () => {
+    db.query(`
+    DELETE FROM role WHERE id = ?
+    `,'role.id' ,function(err, res) {
+        if(err) throw err;
+        console.log('deleted role');
+        mainOption();
+    });
+}
+
+const findEmployee = () => {
+    db.query(`SELECT id,
+    CONCAT(first_name, ' ', last_name) AS 'name'
+    FROM employee`, function(err, res) {
+        if(err) throw err;
+        for(let i = 0; i< res.length ; i++) {
+            employeeObj.push(res[i]);
+        }
+
+        // console.log(employeeObj);
+        return employeeObj;
+    })
+}
+
+
+
+
+const deleteEmployee = () => {
+    db.query(`SELECT id,
+    CONCAT(first_name, ' ', last_name) AS 'name'
+    FROM employee`, function(err, res) {
+        if(err) throw err;
+        inquirer
+            .prompt({
+                name: 'name',
+                type: 'rawlist',
+                message: 'choose to delete',
+                choices: () => {
+                    const list = [];
+                    for(let i = 0; i < res.length; i++) {
+                        list.push(res[i].name);
+                        // console.log(list);
+                    }
+                    return list;
+                }
+            }).then((chosen) => {
+                console.log(chosen);
+                const employeeId = findId(chosen.name, res);
+                console.log(employeeId);
+                db.query(`
+                DELETE FROM employee WHERE id = ?
+                `,employeeId , function(err, res) {
+                    if(err) throw err;
+                    if(res) console.log('delete employ successed');
+                    mainOption();
+                });
+            }).catch((err) => err);
+    });
+
+    // db.query(`
+    // DELETE FROM employee WHERE id = ?
+    // `, 'id', function(err, res) {
+    //     if(err) throw err;
+    //     if(res) console.log('delete employ successed');
+    //     mainOption();
+    // });
+
+    // findEmployee1();
+    // inquirer
+    //     .prompt({
+    //         name: 'name',
+    //         type: 'rawlist',
+    //         message: 'choose to delete',
+    //         choices: () => {
+    //             // const list = [];
+    //             // for(let i = 0; i < employeeObj.length; i++) {
+    //             //     list.push(employeeObj[i]);
+    //             //     // console.log(list);
+    //             // }
+    //             // return list;
+    //         }
+    //     }).then((chosen) => {
+    //         console.log(chosen);
+    //     }).catch((err) => err);
+
+
+}
 
 
 // Department sql functions
@@ -127,15 +253,7 @@ const addDepartment = () => {
             });
         });
 }
-const deleteDepartment = () => {
-    db.query(`
-    DELETE FROM department WHERE id = ?
-    `,'department.id' ,function(err, res) {
-        if(err) throw err;
-        console.log('deleted department');
-        mainOption();
-    });
-}
+
 // role sql functions
 const viewRole = () => {
     db.query(`
@@ -164,8 +282,7 @@ const findDepartment = () => {
 }
 
 
-
-const findDepartmentId = (name, idArray) => {
+const findId = (name, idArray) => {
     for(let i = 0; i < idArray.length ;i++ ) {
         if(name === idArray[i].name) {
             return idArray[i].id;
@@ -203,7 +320,7 @@ const addRole = () => {
                 ]) // prompt end
                 .then((answer) => {
                     // console.log(answer);
-                    const department_id = findDepartmentId(answer.department_name, result);
+                    const department_id = findId(answer.department_name, result);
                     db.query(`
                         INSERT INTO role (title, salary, department_id)
                         VALUES(?,?,?)
@@ -216,7 +333,7 @@ const addRole = () => {
             });
 }
 const findRole = () => {
-    db.query(`SELECT id, title FROM role`,
+    db.query(`SELECT id, title AS 'name' FROM role`,
         function(err, res){
             if(err) throw err;
             for(let i = 0; i < res.length ;i++) {
@@ -227,20 +344,12 @@ const findRole = () => {
         });
 }
 
-const findEmployee = () => {
-    db.query(`SELECT id,
-    CONCAT(first_name, ' ', last_name) AS 'name'
-    FROM employee`, function(err, res) {
-        if(err) throw err;
-        for(let i = 0; i< res.length ; i++) {
 
-        }
-        console.log(res);
-    })
-}
+
 
 const addEmployee = () =>{
             findRole();
+            findEmployee();
             inquirer
                 .prompt([
                     {
@@ -260,7 +369,7 @@ const addEmployee = () =>{
                         choices: () => {
                             const list = [];
                             for(let i = 0; i < roleObj.length; i++) {
-                                list.push(roleObj[i].title);
+                                list.push(roleObj[i].name);
                                 // console.log(list);
                             }
                             return list;
@@ -269,36 +378,35 @@ const addEmployee = () =>{
                     {
                         name: 'manager',
                         type: 'rawlist',
-                        message: 'employee\'s manager',
-                        console: () => {
-
+                        message: 'employee manager',
+                        choices: () => {
+                            employeeObj.push('null');
+                            const list = [];
+                            for(let i = 0; i < employeeObj.length; i++) {
+                                list.push(employeeObj[i]);
+                                // console.log(list);
+                            }
+                            return list;
                         }
                     }
                 ])
                 .then((answer) => {
                     console.log(answer);
+                    const role_id = findId(answer.role, roleObj);
+                    const manager_id = findId(answer.manager, employeeObj);
+                    // console.log('role: ' + role_id + '\nm: ' + manager_id)
+                    db.query(`
+                        INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                        VALUES (?, ?, ? , ?)
+                        `,[answer.first_name ,answer.last_name ,role_id , manager_id] ,function (err, res) {
+                            if(err) throw err;
+                            console.log('add employee successed');
+                            mainOption();
+                        });
                 }).catch(err => err);
         }
-    // db.query(`
-    // INSERT INTO employee (first_name, last_name, role_id, manager_id)
-    // VALUES (?, ?, ? , ?)
-    // `,['first', 'last','role', 'manager'] ,function (err, res) {
-    //     if(err) throw err;
-    //     console.log('add employee successed');
-    //     mainOption();
-    // });
-// }
 
 
-const deleteRole = () => {
-    db.query(`
-    DELETE FROM role WHERE id = ?
-    `,'role.id' ,function(err, res) {
-        if(err) throw err;
-        console.log('deleted role');
-        mainOption();
-    });
-}
 
 // employee sql functions
 const viewEmployee = () => {
@@ -332,14 +440,4 @@ const updateEmployee = () => {
         console.log('updated employee');
         mainOption();
     })
-}
-
-const deleteEmployee = () => {
-    db.query(`
-    DELETE FROM employee WHERE id = ?
-    `, 'id', function(err, res) {
-        if(err) throw err;
-        if(res) console.log('delete employ successed');
-        mainOption();
-    });
 }

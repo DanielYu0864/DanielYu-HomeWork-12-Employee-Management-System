@@ -2,6 +2,7 @@ DROP DATABASE IF EXISTS employee_tracker_DB;
 CREATE DATABASE employee_tracker_DB;
 USE employee_tracker_DB;
 
+
 CREATE TABLE department (
 	id INT AUTO_INCREMENT,
     PRIMARY KEY (id),
@@ -27,11 +28,12 @@ CREATE TABLE employee (
     manager_id INT REFERENCES id
 );
 
+
+
 SELECT * FROM department;
 -- add department
 INSERT INTO department (name)
 VALUES ('Boss'), ('Sales'), ('Engineering');
-
 SELECT * FROM role;
 -- add role
 INSERT INTO role (title, salary, department_id)
@@ -46,11 +48,14 @@ INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('Becky', 'Moon', 2 , 1), ('Ashleigh', ' Mendez', 3, 1);
 
 -- View department
-SELECT department.name AS 'Department'
+SELECT 
+	department.name AS 'Department',
+	id
 FROM department;
 
 -- View role
 SELECT 
+	role.id,
 	role.title AS 'Title',
 	department.name AS 'Department',
     role.salary AS 'Salary'
@@ -80,10 +85,17 @@ INNER JOIN role ON department.id = role.department_id
 LEFT JOIN employee c1 ON role.id = c1.role_id
 LEFT JOIN employee c2 ON c1.manager_id = c2.id;
 
+DELETE 
+FROM employee
+WHERE Role = 'Lawyer';
+
 SELECT 
 	*
 FROM employee
 GROUP BY id;
+
+SELECT * FROM role;
+DELETE FROM role WHERE id = 7; 
 
 -- View employee by department, manager 
 SELECT 
@@ -103,6 +115,7 @@ WHERE department.id = 2;
 
 
 
+
 -- update employee role and manager
 UPDATE employee
 SET role_id = 2,
@@ -114,8 +127,12 @@ DELETE FROM employee WHERE id = 2;
 DELETE FROM role WHERE id = 2;
 DELETE FROM department WHERE id = 2;
 
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123';
 
-
+SELECT id, title FROM role;
+SELECT id,
+    CONCAT(first_name, ' ', last_name) AS 'name'
+    FROM employee;
 
 
 
