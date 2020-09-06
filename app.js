@@ -126,44 +126,71 @@ const deleteFunction = () => {
 }
 
 const deleteDepartment = () => {
-
-
-    db.query(`
-    DELETE FROM department WHERE id = ?
-    `,'department.id' ,function(err, res) {
+    db.query(`SELECT * FROM department`,
+    function(err, res) {
         if(err) throw err;
-        console.log('deleted department');
-        mainOption();
+        inquirer
+        .prompt({
+            name: 'name',
+            type: 'rawlist',
+            message: 'choose to remove',
+            choices: () => {
+                const list = [];
+                for(let i = 0; i < res.length; i ++) {
+                    list.push(res[i]);
+                }
+                return list;
+            }
+        }).then((chosen) => {
+            // console.log(chosen);
+            const departmentId = findId(chosen.name, res);
+            // console.log(departmentId);
+            db.query(`
+                DELETE FROM department WHERE id = ?
+                `,departmentId ,function(err, res) {
+                    if(err) throw err;
+                    console.log('deleted department');
+                    mainOption();
+            });
+        }).catch(err => err);
     });
+
 }
 
 
 const deleteRole = () => {
-    db.query(`
-    DELETE FROM role WHERE id = ?
-    `,'role.id' ,function(err, res) {
-        if(err) throw err;
-        console.log('deleted role');
-        mainOption();
-    });
+    db.query(`SELECT id, title AS 'name' FROM role`,
+        function(err, res){
+            if(err) throw err;
+            inquirer
+                .prompt({
+                    name: 'title',
+                    type: 'rawlist',
+                    message: 'choose to remove',
+                    choices: async () => {
+                        const list = [];
+                        for(let i = 0; i < res.length; i++) {
+                            list.push(res[i]);
+                        }
+                        return list;
+                    }
+                })
+                .then((chosen) => {
+                    console.log(chosen);
+                    const roleId = findId(chosen.title, res);
+                    console.log(roleId);
+                    db.query(`
+                    DELETE FROM role WHERE id = ?
+                    `,roleId ,function(err, res) {
+                        if(err) throw err;
+                        console.log('deleted role');
+                        mainOption();
+                    });
+
+                }) // then
+                .catch(err => err);
+        });
 }
-
-const findEmployee = () => {
-    db.query(`SELECT id,
-    CONCAT(first_name, ' ', last_name) AS 'name'
-    FROM employee`, function(err, res) {
-        if(err) throw err;
-        for(let i = 0; i< res.length ; i++) {
-            employeeObj.push(res[i]);
-        }
-
-        // console.log(employeeObj);
-        return employeeObj;
-    })
-}
-
-
-
 
 const deleteEmployee = () => {
     db.query(`SELECT id,
@@ -186,7 +213,7 @@ const deleteEmployee = () => {
             }).then((chosen) => {
                 console.log(chosen);
                 const employeeId = findId(chosen.name, res);
-                console.log(employeeId);
+                // console.log(employeeId);
                 db.query(`
                 DELETE FROM employee WHERE id = ?
                 `,employeeId , function(err, res) {
@@ -196,40 +223,12 @@ const deleteEmployee = () => {
                 });
             }).catch((err) => err);
     });
-
-    // db.query(`
-    // DELETE FROM employee WHERE id = ?
-    // `, 'id', function(err, res) {
-    //     if(err) throw err;
-    //     if(res) console.log('delete employ successed');
-    //     mainOption();
-    // });
-
-    // findEmployee1();
-    // inquirer
-    //     .prompt({
-    //         name: 'name',
-    //         type: 'rawlist',
-    //         message: 'choose to delete',
-    //         choices: () => {
-    //             // const list = [];
-    //             // for(let i = 0; i < employeeObj.length; i++) {
-    //             //     list.push(employeeObj[i]);
-    //             //     // console.log(list);
-    //             // }
-    //             // return list;
-    //         }
-    //     }).then((chosen) => {
-    //         console.log(chosen);
-    //     }).catch((err) => err);
-
-
 }
 
 
 // Department sql functions
 const viewDepartment = () => {
-    db.query(`SELECT department.name AS 'Department'
+    db.query(`SELECT id AS 'ID' ,department.name AS 'Department'
     FROM department`, function(err, res) {
         if(err) throw err;
         console.log(res);
@@ -269,16 +268,16 @@ const viewRole = () => {
         mainOption();
     });
 }
-
+const departmentObj = [];
 const findDepartment = () => {
     db.query(`SELECT * FROM department`,
         function(err, res) {
             if(err) throw err;
-
-            let deparmentObj = JSON.stringify(res);
-            console.log(deparmentObj);
-            return deparmentObj;
-        })
+            for(let i = 0; i < res.length; i++) {
+                departmentObj.push(res[i]);
+            }
+            return departmentObj;
+        });
 }
 
 
@@ -329,7 +328,9 @@ const addRole = () => {
                             if(err) throw err;
                             console.log('added Role: ' + JSON.stringify(answer));
                         });
-                }).catch(err => err);
+                        mainOption();
+                }) //then
+                .catch(err => err);
             });
 }
 const findRole = () => {
@@ -345,7 +346,19 @@ const findRole = () => {
 }
 
 
+const findEmployee = () => {
+    db.query(`SELECT id,
+    CONCAT(first_name, ' ', last_name) AS 'name'
+    FROM employee`, function(err, res) {
+        if(err) throw err;
+        for(let i = 0; i< res.length ; i++) {
+            employeeObj.push(res[i]);
+        }
 
+        // console.log(employeeObj);
+        return employeeObj;
+    });
+}
 
 const addEmployee = () =>{
             findRole();
@@ -391,7 +404,7 @@ const addEmployee = () =>{
                     }
                 ])
                 .then((answer) => {
-                    console.log(answer);
+                    // console.log(answer);
                     const role_id = findId(answer.role, roleObj);
                     const manager_id = findId(answer.manager, employeeObj);
                     // console.log('role: ' + role_id + '\nm: ' + manager_id)
