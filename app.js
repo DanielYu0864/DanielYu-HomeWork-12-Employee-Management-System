@@ -1,6 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-// const consoleTable = require("console.table");
+const consoleTable = require("console.table");
 const roleObj = [];
 const employeeObj = [];
 const db = mysql.createConnection({
@@ -97,7 +97,6 @@ const addFunction = () => {
         });
 }
 
-
 const deleteFunction = () => {
     inquirer
         .prompt({
@@ -124,6 +123,149 @@ const deleteFunction = () => {
         })
         .catch((err) => err);
 }
+
+const updateFunction = () => {
+    inquirer
+        .prompt({
+            name: 'update',
+            type: 'list',
+            message: 'Update Employee option',
+            choices: ['Employee Role', 'Employee Manager', 'Back']
+        })
+        .then((chosen) => {
+            switch(chosen.update) {
+                case 'Employee Role':
+                    updateEmployeeRole();
+                break;
+                case 'Employee Manager':
+                    updateEmployeeManager();
+                break;
+                default:
+                    mainOption();
+            }
+        })
+        .catch(err => err);
+}
+
+const updateEmployeeRole = () => {
+    db.query(`SELECT id,
+    CONCAT(first_name, ' ', last_name) AS 'name'
+    FROM employee`, function(err, res) {
+        if(err) throw err;
+        inquirer
+            .prompt({
+                name: 'employee',
+                type: 'rawlist',
+                message: 'choose employee to update role',
+                choices: () => {
+                    const list = [];
+                    for(let i = 0; i < res.length; i++) {
+                        list.push(res[i]);
+                    }
+                    return list;
+                }
+            })
+            .then((chosen) => {
+                // console.log(chosen);
+                const employeeId = findId(chosen.employee, res);
+                // console.log(EmployeeId);
+                db.query(`SELECT id, title AS 'name' FROM role`, function(err, res) {
+                    if(err) throw err;
+                    inquirer
+                        .prompt({
+                            name: 'role',
+                            type: 'rawlist',
+                            message: 'choose role to update',
+                            choices: () => {
+                                const list = [];
+                                for(let i = 0; i < res.length; i++) {
+                                    list.push(res[i]);
+                                }
+                                return list;
+                            }
+                        }).then((chosen) => {
+                            console.log(chosen);
+                            const roleId = findId(chosen.role, res);
+                            console.log(roleId);
+                                db.query(`
+                                    UPDATE employee
+                                    SET role_id = ?
+                                    WHERE id = ?;
+                                    `, [roleId ,employeeId], function(err, res) {
+                                        if(err) throw err;
+                                        console.log('updated employee');
+                                        mainOption();
+                                })
+                        }).catch(err => err);
+                }); // query end
+            }) // then
+            .catch(err => err);
+    });
+
+}
+
+
+
+const updateEmployeeManager = () => {
+    db.query(`SELECT id,
+    CONCAT(first_name, ' ', last_name) AS 'name'
+    FROM employee`, function(err, res) {
+        if(err) throw err;
+        inquirer
+            .prompt({
+                name: 'employee',
+                type: 'rawlist',
+                message: 'choose employee to update manager',
+                choices: () => {
+                    const list = [];
+                    for(let i = 0; i < res.length; i++) {
+                        list.push(res[i]);
+                    }
+                    return list;
+                }
+            })
+            .then((chosen) => {
+                // console.log(chosen);
+                const employeeId = findId(chosen.employee, res);
+                // console.log(EmployeeId);
+                db.query(`
+                SELECT id,
+                    CONCAT(first_name, ' ', last_name) AS 'name'
+                    FROM employee
+                `, function(err, res) {
+                    if(err) throw err;
+                    inquirer
+                        .prompt({
+                            name: 'manager',
+                            type: 'rawlist',
+                            message: 'choose manager to update',
+                            choices: () => {
+                                const list = [];
+                                for(let i = 0; i < res.length; i++) {
+                                    list.push(res[i]);
+                                }
+                                return list;
+                            }
+                        }).then((chosen) => {
+                            // console.log(chosen);
+                            const managerId = findId(chosen.manager, res);
+                            // console.log(managerId);
+                                db.query(`
+                                    UPDATE employee
+                                    SET manager_id = ?
+                                    WHERE id = ?;
+                                    `, [managerId ,employeeId], function(err, res) {
+                                        if(err) throw err;
+                                        console.log('updated employee');
+                                        mainOption();
+                                })
+                        }).catch(err => err);
+                }); // query end
+            }) // then
+            .catch(err => err);
+    });
+}
+
 
 const deleteDepartment = () => {
     db.query(`SELECT * FROM department`,
@@ -231,7 +373,7 @@ const viewDepartment = () => {
     db.query(`SELECT id AS 'ID' ,department.name AS 'Department'
     FROM department`, function(err, res) {
         if(err) throw err;
-        console.log(res);
+        console.table(['ID', 'Name'] ,res);
         mainOption();
     });
 }
@@ -249,7 +391,9 @@ const addDepartment = () => {
                 `, input.name ,function(err, res) {
                 if(err) throw err;
                 console.log('add department successed');
+                mainOption();
             });
+
         });
 }
 
@@ -264,7 +408,7 @@ const viewRole = () => {
     FROM department
     INNER JOIN role ON department.id = role.department_id`,function(err, res) {
         if(err) throw err;
-        console.log(res);
+        console.table(res);
         mainOption();
     });
 }
@@ -290,7 +434,7 @@ const findId = (name, idArray) => {
 }
 const addRole = () => {
     db.query(`SELECT * FROM department`,
-        function(err, result) {
+        function(err, res) {
             if(err) throw err;
             inquirer
                 .prompt([
@@ -310,8 +454,8 @@ const addRole = () => {
                         message: 'department',
                         choices: () => {
                             const list = [];
-                            for(let i = 0; i < result.length; i++) {
-                                list.push(result[i].name);
+                            for(let i = 0; i < res.length; i++) {
+                                list.push(res[i].name);
                             }
                             return list;
                             }
@@ -319,7 +463,7 @@ const addRole = () => {
                 ]) // prompt end
                 .then((answer) => {
                     // console.log(answer);
-                    const department_id = findId(answer.department_name, result);
+                    const department_id = findId(answer.department_name, res);
                     db.query(`
                         INSERT INTO role (title, salary, department_id)
                         VALUES(?,?,?)
@@ -346,6 +490,8 @@ const findRole = () => {
 }
 
 
+
+
 const findEmployee = () => {
     db.query(`SELECT id,
     CONCAT(first_name, ' ', last_name) AS 'name'
@@ -361,63 +507,63 @@ const findEmployee = () => {
 }
 
 const addEmployee = () =>{
-            findRole();
-            findEmployee();
-            inquirer
-                .prompt([
-                    {
-                        name: 'first_name',
-                        type: 'input',
-                        message: 'Employee\'s first name'
-                    },
-                    {
-                        name: 'last_name',
-                        type: 'input',
-                        message: 'Employee\'s last name'
-                    },
-                    {
-                        name: 'role',
-                        type: 'rawlist',
-                        message: 'employee role',
-                        choices: () => {
-                            const list = [];
-                            for(let i = 0; i < roleObj.length; i++) {
-                                list.push(roleObj[i].name);
-                                // console.log(list);
-                            }
-                            return list;
-                        }
-                    },
-                    {
-                        name: 'manager',
-                        type: 'rawlist',
-                        message: 'employee manager',
-                        choices: () => {
-                            employeeObj.push('null');
-                            const list = [];
-                            for(let i = 0; i < employeeObj.length; i++) {
-                                list.push(employeeObj[i]);
-                                // console.log(list);
-                            }
-                            return list;
-                        }
+    findRole();
+    findEmployee();
+    inquirer
+        .prompt([
+            {
+                name: 'first_name',
+                type: 'input',
+                message: 'Employee\'s first name'
+            },
+            {
+                name: 'last_name',
+                type: 'input',
+                message: 'Employee\'s last name'
+            },
+            {
+                name: 'role',
+                type: 'rawlist',
+                message: 'employee role',
+                choices: () => {
+                    const list = [];
+                    for(let i = 0; i < roleObj.length; i++) {
+                        list.push(roleObj[i].name);
+                        // console.log(list);
                     }
-                ])
-                .then((answer) => {
-                    // console.log(answer);
-                    const role_id = findId(answer.role, roleObj);
-                    const manager_id = findId(answer.manager, employeeObj);
-                    // console.log('role: ' + role_id + '\nm: ' + manager_id)
-                    db.query(`
-                        INSERT INTO employee (first_name, last_name, role_id, manager_id)
-                        VALUES (?, ?, ? , ?)
-                        `,[answer.first_name ,answer.last_name ,role_id , manager_id] ,function (err, res) {
-                            if(err) throw err;
-                            console.log('add employee successed');
-                            mainOption();
-                        });
-                }).catch(err => err);
-        }
+                    return list;
+                }
+            },
+            {
+                name: 'manager',
+                type: 'rawlist',
+                message: 'employee manager',
+                choices: () => {
+                    employeeObj.push('null');
+                    const list = [];
+                    for(let i = 0; i < employeeObj.length; i++) {
+                        list.push(employeeObj[i]);
+                        // console.log(list);
+                    }
+                    return list;
+                }
+            }
+        ])
+        .then((answer) => {
+            // console.log(answer);
+            const role_id = findId(answer.role, roleObj);
+            const manager_id = findId(answer.manager, employeeObj);
+            // console.log('role: ' + role_id + '\nm: ' + manager_id)
+            db.query(`
+                INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                VALUES (?, ?, ? , ?)
+                `,[answer.first_name ,answer.last_name ,role_id , manager_id] ,function (err, res) {
+                    if(err) throw err;
+                    console.log('add employee successed');
+                    mainOption();
+                });
+        }).catch(err => err);
+}
 
 
 
@@ -434,23 +580,11 @@ const viewEmployee = () => {
         CONCAT(c2.first_name, ' ', c2.last_name) AS 'Manager'
     FROM department
     INNER JOIN role ON department.id = role.department_id
-    LEFT JOIN employee c1 ON role.id = c1.role_id
+    INNER JOIN employee c1 ON role.id = c1.role_id
     LEFT JOIN employee c2 ON c1.manager_id = c2.id
     `, function(err, res) {
         if(err) throw err;
-        console.log(res);
+        console.table(res);
         mainOption();
     });
-}
-
-const updateEmployee = () => {
-    db.query(`
-    UPDATE employee
-    SET role_id = ?
-    WHERE id = ?;
-    `, ['role_id','employee.id'], function(err, res) {
-        if(err) throw err;
-        console.log('updated employee');
-        mainOption();
-    })
 }

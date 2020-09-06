@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS employee_tracker_DB;
 CREATE DATABASE employee_tracker_DB;
 USE employee_tracker_DB;
 
-
+-- DROP DATABASE employee_tracker_DB;
 CREATE TABLE department (
 	id INT AUTO_INCREMENT,
     PRIMARY KEY (id),
@@ -39,7 +39,9 @@ SELECT * FROM role;
 INSERT INTO role (title, salary, department_id)
 VALUES('Boss', 0, 1),  ('Sales Lead', 100000, 2),  ('Lead Engineer', 150000, 3);
 
-
+SELECT
+    CONCAT(first_name, ' ', last_name) AS 'name'
+    FROM employee;
 SELECT * FROM employee;
 -- add employee
 INSERT INTO employee (first_name, last_name, role_id)
