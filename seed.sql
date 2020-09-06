@@ -73,7 +73,7 @@ SELECT
 FROM employee c1
 INNER JOIN employee c2 ON c1.manager_id = c2.id;
 
--- View employee
+-- View employee by manager
 SELECT 
 	employee.id AS 'ID',
 	employee.first_name AS 'First Name',
@@ -85,6 +85,11 @@ FROM department
 INNER JOIN role ON department.id = role.department_id
 INNER JOIN employee ON role.id = employee.role_id
 WHERE manager_id = 1;
+
+-- view employee id by id
+SELECT id
+    FROM employee
+    WHERE id = 1;
 
 SELECT 
 	c1.id AS 'ID',
@@ -98,9 +103,6 @@ FROM department
 INNER JOIN role ON department.id = role.department_id
 INNER JOIN employee c1 ON role.id = c1.role_id
 LEFT JOIN employee c2 ON c1.manager_id = c2.id;
-DELETE 
-FROM employee
-WHERE Role = 'Lawyer';
 
 SELECT 
 	*
@@ -126,7 +128,22 @@ LEFT JOIN employee c2 ON c1.manager_id = c2.id
 WHERE department.id = 2;
 -- WHERE c1.manager_id = 1; 
 
+SELECT SUM(role.salary) FROM role;
+-- department budget 
+SELECT 
+	department.name,
+    SUM(role.salary) AS 'Department Budget'
+FROM department
+INNER JOIN role ON department.id = role.department_id
+LEFT JOIN employee c1 ON role.id = c1.role_id
+LEFT JOIN employee c2 ON c1.manager_id = c2.id
+GROUP BY department.id;
 
+SELECT 
+	SUM(role.salary)
+FROM role
+INNER JOIN department ON department.id = role.department_id
+LEFT JOIN employee ON role.id = employee.role_id;
 
 
 -- update employee role and manager
@@ -146,6 +163,5 @@ SELECT id, title FROM role;
 SELECT id,
     CONCAT(first_name, ' ', last_name) AS 'name'
     FROM employee;
-
 
 
