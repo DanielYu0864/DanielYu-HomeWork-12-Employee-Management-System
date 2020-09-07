@@ -1,34 +1,3 @@
-DROP DATABASE IF EXISTS employee_tracker_DB;
-CREATE DATABASE employee_tracker_DB;
-USE employee_tracker_DB;
-
--- DROP DATABASE employee_tracker_DB;
-CREATE TABLE department (
-	id INT AUTO_INCREMENT,
-    PRIMARY KEY (id),
-    name VARCHAR (30) NOT NULL
-);
-
-CREATE TABLE role (
-	id INT AUTO_INCREMENT,
-    PRIMARY KEY (id),
-    title VARCHAR(30) NOT NULL,
-    salary DEC NOT NULL,
-    department_id INT NOT NULL,
-    FOREIGN KEY (department_id) REFERENCES department(id)
-);
-
-CREATE TABLE employee (
-	id INT AUTO_INCREMENT,
-    PRIMARY KEY (id),
-    first_name VARCHAR(30) NOT NULL,
-    last_name VARCHAR(30) NOT NULL,
-    role_id INT NOT NULL,
-    FOREIGN KEY (role_id) REFERENCES role(id),
-    manager_id INT REFERENCES id
-);
-
-
 
 SELECT * FROM department;
 -- add department
@@ -50,13 +19,13 @@ INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('Becky', 'Moon', 2 , 1), ('Ashleigh', ' Mendez', 3, 1);
 
 -- View department
-SELECT 
+SELECT
 	department.name AS 'Department',
 	id
 FROM department;
 
 -- View role
-SELECT 
+SELECT
 	role.id,
 	role.title AS 'Title',
 	department.name AS 'Department',
@@ -65,7 +34,7 @@ FROM department
 INNER JOIN role ON department.id = role.department_id;
 
 -- View employee and manager
-SELECT 
+SELECT
 	c1.id AS 'ID',
 	c1.first_name AS 'First Name',
     c1.last_name AS 'Last Name',
@@ -74,7 +43,7 @@ FROM employee c1
 INNER JOIN employee c2 ON c1.manager_id = c2.id;
 
 -- View employee by manager
-SELECT 
+SELECT
 	employee.id AS 'ID',
 	employee.first_name AS 'First Name',
     employee.last_name AS 'Last Name',
@@ -91,7 +60,7 @@ SELECT id
     FROM employee
     WHERE id = 1;
 
-SELECT 
+SELECT
 	c1.id AS 'ID',
 	c1.first_name AS 'First Name',
     c1.last_name AS 'Last Name',
@@ -104,16 +73,16 @@ INNER JOIN role ON department.id = role.department_id
 INNER JOIN employee c1 ON role.id = c1.role_id
 LEFT JOIN employee c2 ON c1.manager_id = c2.id;
 
-SELECT 
+SELECT
 	*
 FROM employee
 GROUP BY id;
 
 SELECT * FROM role;
-DELETE FROM role WHERE id = 7; 
+DELETE FROM role WHERE id = 7;
 
--- View employee by department, manager 
-SELECT 
+-- View employee by department, manager
+SELECT
 	c1.id AS 'ID',
 	c1.first_name AS 'First Name',
     c1.last_name AS 'Last Name',
@@ -126,11 +95,11 @@ INNER JOIN role ON department.id = role.department_id
 LEFT JOIN employee c1 ON role.id = c1.role_id
 LEFT JOIN employee c2 ON c1.manager_id = c2.id
 WHERE department.id = 2;
--- WHERE c1.manager_id = 1; 
+-- WHERE c1.manager_id = 1;
 
 SELECT SUM(role.salary) FROM role;
--- department budget 
-SELECT 
+-- department budget
+SELECT
 	department.name,
     SUM(role.salary) AS 'Department Budget'
 FROM department
@@ -139,7 +108,7 @@ LEFT JOIN employee c1 ON role.id = c1.role_id
 LEFT JOIN employee c2 ON c1.manager_id = c2.id
 GROUP BY department.id;
 
-SELECT 
+SELECT
 	SUM(role.salary)
 FROM role
 INNER JOIN department ON department.id = role.department_id
@@ -163,5 +132,3 @@ SELECT id, title FROM role;
 SELECT id,
     CONCAT(first_name, ' ', last_name) AS 'name'
     FROM employee;
-
-
