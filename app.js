@@ -12,6 +12,7 @@ const db = mysql.createConnection({
 
 db.connect(function(err) {
     if(err) throw err;
+    console.table(W);
     console.table('Welcome to Employee Management System');
     mainOption();
 });
@@ -637,3 +638,11 @@ GROUP BY department.id;
 `;
 const roleObj = [];
 const employeeObj = [];
+const W = `
+                         ==============
+                        || ---    --- ||
+                        || \\  \\  /  / ||
+                        ||  \\  \\/  /  ||
+                        ||   \\_/\\_/   ||
+                         ==============
+`

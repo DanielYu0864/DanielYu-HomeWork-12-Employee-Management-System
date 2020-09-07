@@ -1,4 +1,39 @@
 # Unit 12 MySQL Homework: Employee Tracker
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+![screenshot](./utils/generator.gif)
+
+### Project Description
+
+* A sample Content Management Systems to be able to view and manage the departments, roles, and employees in the company.
+* The application is using MySQL to content all the company database, and use Node.js to view and manage the SQL database.
+
+
+
+### Install
+```md
+npm install
+```
+
+### Usage
+```md
+node app.js
+```
+
+### Language
+```md
+Javascrpit
+Node.js
+MySQL
+```
+
+## About
+* Project Github: https://github.com/DanielYu0864/DanielYu-HomeWork-12-Employee-Management-System
+* Author: [`DanielYu0864`](https://github.com/DanielYu0864)
+
+## Questions
+*  For more question please contact me: adam741963@gmail.com
+
 
 Developers are often tasked with creating interfaces that make it easy for non-developers to view and interact with information stored in databases. Often these interfaces are known as **C**ontent **M**anagement **S**ystems. In this homework assignment, your challenge is to architect and build a solution for managing a company's employees using node, inquirer, and MySQL.
 
