@@ -11,15 +11,22 @@
 
 
 ### Install
-```md`
+```md
 npm install
 ```
 
 ### Usage
 
 1. node app.js
-
 ![nodeapp](./Assets/gif/nodeappjs.gif)
+2. View
+ * Department
+ ![viewDepartent](./Assets/screenshot/viewDepartment.png)
+ * Role
+ ![viewRole](./Assets/screenshot/viewRole.png)
+ * Employee
+ ![viewEmployee](./Assets/screenshot/viewEmploy.png)
+ *
 
 ### Language
 ```md
