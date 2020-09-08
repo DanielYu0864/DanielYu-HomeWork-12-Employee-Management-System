@@ -23,27 +23,63 @@ npm install
 
 2. View
 
- * Department
+* Department
 
  ![viewDepartent](./Assets/screenshot/viewDepartment.png)
 
- * Role
+* Role
 
  ![viewRole](./Assets/screenshot/viewRole.png)
 
- * Employee
+* Employee
 
  ![viewEmployee](./Assets/screenshot/viewEmployee.png)
 
- * Department Budget
+* Department Budget
 
  ![departmentBudget](./Assets/gif/viewBudget.gif)
 
- * View Employee by manager
+* View Employee by manager
 
  ![departmentBudget](./Assets/gif/viewByManager.gif)
 
+3. Add
 
+* Department
+
+ ![addDepartent](./Assets/gif/addDepartment.gif)
+
+* Role
+
+ ![addRole](./Assets/gif/addRole.gif)
+
+* Employee
+
+ ![addEmployee](./Assets/gif/addEmployee.gif)
+
+4. Update Employee data
+
+* Update Employee Role
+
+ ![updateEmployeeRole](./Assets/gif/updateRole.gif)
+
+* Update Employee Manager
+
+ ![updateEmployeeManager](./Assets/gif/updateManager.gif)
+
+5. Delete
+
+* Department
+
+ ![deleteDepartment](./Assets/gif/deleteDepartment.gif)
+
+* Role
+
+ ![deleteRole](./Assets/gif/deleteRole.gif)
+
+* Employee
+
+ ![deleteEmployee](./Assets/gif/deleteEmployee.gif)
 
 ### Language
 ```md
