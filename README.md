@@ -18,15 +18,32 @@ npm install
 ### Usage
 
 1. node app.js
+
 ![nodeapp](./Assets/gif/nodeappjs.gif)
+
 2. View
+
  * Department
+
  ![viewDepartent](./Assets/screenshot/viewDepartment.png)
+
  * Role
+
  ![viewRole](./Assets/screenshot/viewRole.png)
+
  * Employee
- ![viewEmployee](./Assets/screenshot/viewEmploy.png)
- *
+
+ ![viewEmployee](./Assets/screenshot/viewEmployee.png)
+
+ * Department Budget
+
+ ![departmentBudget](./Assets/gif/viewBudget.gif)
+
+ * View Employee by manager
+
+ ![departmentBudget](./Assets/gif/viewByManager.gif)
+
+
 
 ### Language
 ```md
