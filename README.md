@@ -1,7 +1,7 @@
 # Unit 12 MySQL Homework: Employee Tracker
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-![screenshot](./utils/generator.gif)
+![screenshot](./Assets/screenshot/screenshot.png)
 
 ### Project Description
 
@@ -11,14 +11,15 @@
 
 
 ### Install
-```md
+```md`
 npm install
 ```
 
 ### Usage
-```md
-node app.js
-```
+
+1. node app.js
+
+![nodeapp](./Assets/gif/nodeappjs.gif)
 
 ### Language
 ```md
