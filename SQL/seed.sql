@@ -59,7 +59,7 @@ WHERE manager_id = 1;
 SELECT id
     FROM employee
     WHERE id = 1;
-
+-- view employee with department and manager
 SELECT
 	c1.id AS 'ID',
 	c1.first_name AS 'First Name',

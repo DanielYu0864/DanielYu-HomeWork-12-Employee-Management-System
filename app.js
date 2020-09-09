@@ -46,7 +46,7 @@ const mainOption = () => {
     });
 }
 
-// ####################################################################################################
+// #################################################################################################################
 // view function
 const viewFunction = () => {
     inquirer
@@ -157,7 +157,7 @@ const viewDepartmentBudget = () => {
         mainOption();
     });
 }
-// #######################################################################################
+// #################################################################################################################
 // Add Functions
 const addFunction = () => {
     inquirer
@@ -309,7 +309,7 @@ const addEmployee = () =>{
         }).catch(err => err);
 }
 
-// ##################################################################################
+// #################################################################################################################
 // update functions
 const updateFunction = () => {
     inquirer
@@ -443,7 +443,7 @@ const updateEmployeeManager = () => {
     });
 }
 
-// ################################################################################
+// #################################################################################################################
 // delete functions
 const deleteFunction = () => {
     inquirer
@@ -490,9 +490,7 @@ const deleteDepartment = () => {
                 return list;
             }
         }).then((chosen) => {
-            // console.log(chosen);
             const departmentId = findId(chosen.name, res);
-            // console.log(departmentId);
             db.query(`
                 DELETE FROM department WHERE id = ?
                 `,departmentId ,function(err, res) {
@@ -552,14 +550,12 @@ const deleteEmployee = () => {
                     const list = [];
                     for(let i = 0; i < res.length; i++) {
                         list.push(res[i].name);
-                        // console.log(list);
                     }
                     return list;
                 }
             }).then((chosen) => {
                 console.log(chosen);
                 const employeeId = findId(chosen.name, res);
-                // console.log(employeeId);
                 db.query(`
                 DELETE FROM employee WHERE id = ?
                 `,employeeId , function(err, res) {
@@ -586,7 +582,6 @@ const findRole = () => {
             for(let i = 0; i < res.length ;i++) {
                 roleObj.push(res[i]);
             }
-            // console.log(roleObj);
             return roleObj;
         });
 }
@@ -596,8 +591,6 @@ const findEmployee = () => {
         for(let i = 0; i< res.length ; i++) {
             employeeObj.push(res[i]);
         }
-
-        // console.log(employeeObj);
         return employeeObj;
     });
 }
